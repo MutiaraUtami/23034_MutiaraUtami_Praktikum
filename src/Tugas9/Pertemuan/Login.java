@@ -12,6 +12,12 @@ import java.awt.event.KeyEvent;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import javax.swing.JOptionPane;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.sql.SQLException;
 
 public class Login extends javax.swing.JFrame {
 
@@ -116,17 +122,38 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_passActionPerformed
 
     private void LoginBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoginBtnActionPerformed
-        if((id.getText().equals("muti20"))&&
-        (String.valueOf(pass.getPassword()).equals("muti"))){
-        new OperasiPertambahan2Angka().setVisible(true);
-        dispose();
-        }else{
-        JOptionPane.showMessageDialog(null,id.getText()+", password anda salah", 
-                "pesan Kesalahan",JOptionPane.ERROR_MESSAGE);
-        id.setText("");
-        pass.setText("");
-        id.requestFocus();
-         }
+        String user_id = id.getText();
+        String user_pwd = new String(pass.getPassword());
+
+        try {
+            // Membuat koneksi ke database
+            Connection connection = Koneksi.konek();
+
+            // Query SQL untuk mengecek username dan password
+            String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, user_id);
+            preparedStatement.setString(2, user_pwd);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if(resultSet.next()) {
+                // Jika login berhasil, tampilkan halaman berikutnya
+                new OperasiPertambahan2Angka().setVisible(true);
+                dispose(); 
+            } else {
+                JOptionPane.showMessageDialog(null, "Username atau Password salah!");
+            }
+
+            // Tutup koneksi
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+
+        } catch (SQLException | ClassNotFoundException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, "Koneksi ke database gagal: " + ex.getMessage());
+        }
     }//GEN-LAST:event_LoginBtnActionPerformed
 
     /**
