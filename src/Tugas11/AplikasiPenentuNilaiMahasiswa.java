@@ -1,7 +1,4 @@
-package Tugas11;
 
-
-import Tugas9.Pertemuan.*;
 import Tugas9.Pertemuan.NilaiMhs2;
 import java.awt.event.KeyEvent;
 import java.io.BufferedWriter;
